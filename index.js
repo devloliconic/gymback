@@ -446,6 +446,7 @@ app.get("/gym/:id/equipment/:equipmentId", async (req, res) => {
 });
 
 app.delete("/gym/:id", async (req, res) => {
+  await Coach.destroy({ where: { gym_id: req.params.id } });
   await Gym.destroy({ where: { gym_id: req.params.id } });
 
   res.json(200);
@@ -571,6 +572,7 @@ app.put("/client/:id", async (req, res) => {
 });
 
 app.delete("/client/:id", async (req, res) => {
+  await Workout.destroy({ where: { client_id: req.params.id } });
   await User.destroy({ where: { user_id: req.params.id } });
 
   res.json(200);
