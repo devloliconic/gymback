@@ -16,11 +16,15 @@ import { Equipment } from "./modules/equipment.js";
 import { Others } from "./modules/others.js";
 import { Workout } from "./modules/workout.js";
 
+import swaggerUi from "swagger-ui-express";
+import specs from "./swaggerConfig.js";
+
 const port = 8000;
 
 connectToDatabase();
 
 const app = express();
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -66,10 +70,7 @@ app.post("/login", async (req, res) => {
   console.log("admin", admin);
 
   if (admin) {
-    const accessToken = jwt.sign(
-      { login: admin.login, role: admin.role },
-      accessTokenSecret
-    );
+    const accessToken = jwt.sign({ login: admin.login, role: admin.role }, accessTokenSecret);
 
     res.json({
       accessToken,
@@ -180,12 +181,7 @@ app.get("/user/me", authenticateJWT, async (req, res) => {
 
 app.get("/gym", async (req, res) => {
   const allGyms = await Gym.findAll({
-    include: [
-      { model: Address },
-      { model: Contact },
-      { model: Equipment },
-      { model: Others },
-    ],
+    include: [{ model: Address }, { model: Contact }, { model: Equipment }, { model: Others }],
   });
 
   res.json(allGyms);
@@ -199,12 +195,7 @@ app.get("/gym/:id", async (req, res) => {
   }
   const gym = await Gym.findOne({
     where: { gym_id: id },
-    include: [
-      { model: Address },
-      { model: Contact },
-      { model: Equipment },
-      { model: Others },
-    ],
+    include: [{ model: Address }, { model: Contact }, { model: Equipment }, { model: Others }],
   });
 
   if (!gym) {
@@ -216,14 +207,7 @@ app.get("/gym/:id", async (req, res) => {
 });
 
 app.post("/gym", async (req, res) => {
-  const {
-    name,
-    сapacity,
-    phoneNumber,
-    email,
-    address: addressString,
-    index,
-  } = req.body;
+  const { name, сapacity, phoneNumber, email, address: addressString, index } = req.body;
 
   const address = await Address.create({ address: addressString, index });
   const contact = await Contact.create({ email: email, phoneNumber });
@@ -253,12 +237,7 @@ app.post("/gym/:id/equipment", async (req, res) => {
 
   const result = await Gym.findOne({
     where: { gym_id: id },
-    include: [
-      { model: Address },
-      { model: Contact },
-      { model: Equipment },
-      { model: Others },
-    ],
+    include: [{ model: Address }, { model: Contact }, { model: Equipment }, { model: Others }],
   });
 
   res.json(result);
@@ -277,12 +256,7 @@ app.post("/gym/:id/others", async (req, res) => {
 
   const result = await Gym.findOne({
     where: { gym_id: id },
-    include: [
-      { model: Address },
-      { model: Contact },
-      { model: Equipment },
-      { model: Others },
-    ],
+    include: [{ model: Address }, { model: Contact }, { model: Equipment }, { model: Others }],
   });
 
   res.json(result);
@@ -310,12 +284,7 @@ app.delete("/gym/:id/others/:othersId", async (req, res) => {
 
   const result = await Gym.findOne({
     where: { gym_id: id },
-    include: [
-      { model: Address },
-      { model: Contact },
-      { model: Equipment },
-      { model: Others },
-    ],
+    include: [{ model: Address }, { model: Contact }, { model: Equipment }, { model: Others }],
   });
 
   res.json(result);
@@ -343,12 +312,7 @@ app.delete("/gym/:id/equipment/:equipmentId", async (req, res) => {
 
   const result = await Gym.findOne({
     where: { gym_id: id },
-    include: [
-      { model: Address },
-      { model: Contact },
-      { model: Equipment },
-      { model: Others },
-    ],
+    include: [{ model: Address }, { model: Contact }, { model: Equipment }, { model: Others }],
   });
 
   res.json(result);
@@ -370,12 +334,7 @@ app.put("/gym/:id/others/:othersId", async (req, res) => {
 
   const result = await Gym.findOne({
     where: { gym_id: id },
-    include: [
-      { model: Address },
-      { model: Contact },
-      { model: Equipment },
-      { model: Others },
-    ],
+    include: [{ model: Address }, { model: Contact }, { model: Equipment }, { model: Others }],
   });
 
   res.json(result);
@@ -397,12 +356,7 @@ app.put("/gym/:id/equipment/:equipmentId", async (req, res) => {
 
   const result = await Gym.findOne({
     where: { gym_id: id },
-    include: [
-      { model: Address },
-      { model: Contact },
-      { model: Equipment },
-      { model: Others },
-    ],
+    include: [{ model: Address }, { model: Contact }, { model: Equipment }, { model: Others }],
   });
 
   res.json(result);
@@ -453,16 +407,7 @@ app.delete("/gym/:id", async (req, res) => {
 });
 
 app.put("/gym/:id", async (req, res) => {
-  const {
-    name,
-    сapacity,
-    phoneNumber,
-    email,
-    address: addressString,
-    index,
-    contact_id,
-    address_id,
-  } = req.body;
+  const { name, сapacity, phoneNumber, email, address: addressString, index, contact_id, address_id } = req.body;
 
   const address = await Address.findOne({ address_id: address_id });
   const contact = await Contact.findOne({ contact_id: email, phoneNumber });
@@ -488,16 +433,8 @@ app.get("/client", async (req, res) => {
   res.json(allGyms);
 });
 
-app.post("/client", async (req, res) => {
-  const {
-    email,
-    password,
-    firstName,
-    middleName,
-    lastName,
-    gender,
-    birthDate,
-  } = req.body;
+app.post("/clients", async (req, res) => {
+  const { email, password, firstName, middleName, lastName, gender, birthDate } = req.body;
 
   const newUser = await User.create({
     email,
@@ -534,16 +471,7 @@ app.get("/client/:id", async (req, res) => {
 
 app.put("/client/:id", async (req, res) => {
   const { id } = req.params;
-  const {
-    email,
-    password,
-    firstName,
-    middleName,
-    lastName,
-    gender,
-    birthDate,
-    ticketId,
-  } = req.body;
+  const { email, password, firstName, middleName, lastName, gender, birthDate, ticketId } = req.body;
 
   const currentUser = await User.findOne({ where: { user_id: id } });
 
